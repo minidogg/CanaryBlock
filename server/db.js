@@ -51,13 +51,13 @@ async function DBFind(filePath, condition) {
 }
 
 function SliceArrayOverflow(array, max = 50){
-    if(!isCacheChecking && array.length>=max)array.pop()
+    if(array.length>=max)array.pop()
 }
 
 // TODO: Name this variable better
 async function SillyFinder9000(filePath, cache, url){
     for(let i of cache){
-        if(typeof(i=="string"&&url.startsWith(i))){
+        if(typeof(i)=="string"&&url.startsWith(i)==true){
             return true;
         }
         if(i instanceof RegExp&&i.test(url)){
@@ -80,7 +80,9 @@ async function SillyFinder9000(filePath, cache, url){
                 SliceArrayOverflow(cache)
                 return true;
             }
-        }catch{}
+        }catch(err){
+            console.warn(err)
+        }
         return false;
     }
 
