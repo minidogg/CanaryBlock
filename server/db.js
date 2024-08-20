@@ -91,7 +91,7 @@ async function SillyFinder9000(filePath, cache, url){
 
 // Function for checking if a url is blocked
 async function IsBlocked(url){
-    if(IsWhitelisted(url)==true)return false;
+    // if(IsWhitelisted(url)==true)return false;
     return SillyFinder9000(blockedPath, blockedCache, url)
 }
 
@@ -103,14 +103,14 @@ async function IsWhitelisted(url){
 
 console.time("No Cache")
 console.log(await IsBlocked("https://google.com/addsasads")) // False
-// console.log(await IsWhitelisted("https://google.com/dsasads")) // True
+console.log(await IsWhitelisted("https://google.com/dsasads")) // True
 console.log(await IsBlocked("https://sites.google.com/site/classroom6x/the-final-earth-2?authuser=0")) // True
-// console.log(await IsWhitelisted("https://sites.google.com/site/classroom6x/the-final-earth-2?authuser=0")) // False
+console.log(await IsWhitelisted("https://sites.google.com/site/classroom6x/the-final-earth-2?authuser=0")) // False
 console.timeEnd("No Cache")
 
 console.time("Cache")
 console.log(await IsBlocked("https://google.com/addsasads")) // False
-// console.log(await IsWhitelisted("https://google.com/dsasads")) // True
+console.log(await IsWhitelisted("https://google.com/dsasads")) // True
 console.log(await IsBlocked("https://sites.google.com/site/classroom6x/the-final-earth-2?authuser=0")) // True
-// console.log(await IsWhitelisted("https://sites.google.com/site/classroom6x/the-final-earth-2?authuser=0")) // False
+console.log(await IsWhitelisted("https://sites.google.com/site/classroom6x/the-final-earth-2?authuser=0")) // False
 console.timeEnd("Cache")
