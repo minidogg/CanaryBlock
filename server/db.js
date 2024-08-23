@@ -1,5 +1,3 @@
-// e=>e.isRegex==false?url.startsWith(e.url):new RegExp(e.url).test(url)
-
 // Imports
 import * as fs from 'fs';
 import * as path from 'path';
@@ -16,11 +14,13 @@ fu.TryMkFile(blockedPath, "", "utf-8");
 fu.TryMkFile(whitelistPath, "", "utf-8");
 
 // Cache arrays to minimize reads
-let blockedCache = [];
-let whitelistCache = [];
+let blockedCache = new Set();
+let whitelistCache = new Set();
 
 // Chunk Size
+// TODO: Change the code so that we can support a bigger chunk size.
 const CHUNK_SIZE = 1;
+
 
 // General Finding Function
 async function DBFind(filePath, condition) {
@@ -33,8 +33,9 @@ async function DBFind(filePath, condition) {
     for await (const data of stream) {
         text += data.toString()
         if (text.endsWith("\n")) {
-            text = text.replace("\n", "")
-            text = text.replace("\r", "")
+            text = text.substring(0, text.length-1)
+            if(text[text.length-1]=="\r")text = text.substring(0, text.length-1)
+
 
 
             if (condition(text) == true) {
@@ -50,8 +51,12 @@ async function DBFind(filePath, condition) {
     return found
 }
 
-function SliceArrayOverflow(array, max = 50){
-    if(array.length>=max)array.pop()
+function ManageCacheOverflow(set, max = 50){
+    if (set.size >= max) {
+        // Convert to array to remove oldest entry
+        const oldest = Array.from(set)[0];
+        set.delete(oldest);
+    }
 }
 
 // TODO: Name this variable better
@@ -69,15 +74,15 @@ async function SillyFinder9000(filePath, cache, url){
     let foundCondition = function(text){
         try{
             if(url.startsWith(text)){
-                cache.push(text)
-                SliceArrayOverflow(cache)
+                cache.add(text)
+                ManageCacheOverflow(cache)
                 return true;
             }
             let reg = new RegExp(text);
 
             if(reg.test(url)){
-                cache.push(reg)
-                SliceArrayOverflow(cache)
+                cache.add(reg)
+                ManageCacheOverflow(cache)
                 return true;
             }
         }catch(err){
@@ -86,8 +91,6 @@ async function SillyFinder9000(filePath, cache, url){
         return false;
     }
 
-    
-    
     return DBFind(filePath, foundCondition)
 }
 
@@ -116,3 +119,4 @@ console.log(await IsWhitelisted("https://google.com/dsasads")) // True
 console.log(await IsBlocked("https://sites.google.com/site/classroom6x/the-final-earth-2?authuser=0")) // True
 console.log(await IsWhitelisted("https://sites.google.com/site/classroom6x/the-final-earth-2?authuser=0")) // False
 console.timeEnd("Cache")
+
